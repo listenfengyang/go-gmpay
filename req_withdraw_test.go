@@ -1,4 +1,4 @@
-package go_nowpay
+package go_nepay
 
 import (
 	"testing"
@@ -7,7 +7,13 @@ import (
 func TestWithdraw(t *testing.T) {
 	vLog := VLog{}
 	//构造client
-	cli := NewClient(vLog, &NowPayInitParams{MerchantInfo{MERCHANT_ID, ACCESS_KEY, BACK_KEY}, DEPOSIT_URL, WITHDRAW_URL})
+	cli := NewClient(vLog, &NePayInitParams{
+		MerchantInfo:      MerchantInfo{MERCHANT_ID, ACCESS_KEY},
+		DepositUrl:        DEPOSIT_URL,
+		WithdrawUrl:       WITHDRAW_URL,
+		NotifyUrl:         NOTIFY_URL,
+		WithdrawNotifyUrl: WITHDRAW_NOTIFY_URL,
+	})
 
 	//发请求
 	resp, err := cli.WithdrawReq(GenWithdrawRequestDemo())
@@ -18,14 +24,12 @@ func TestWithdraw(t *testing.T) {
 	cli.logger.Infof("resp:%+v\n", resp)
 }
 
-func GenWithdrawRequestDemo() NowPayWithdrawReq {
-	data := make([]WithdrawData, 1, 2)
-	data[0] = WithdrawData{
-		UserName:    "张三",
-		BankcardNo:  "353236326",
-		SerialNo:    "2025642422446",
-		BankAddress: "fgww",
-		Amount:      "1",
+func GenWithdrawRequestDemo() NePayWithdrawReq {
+	return NePayWithdrawReq{
+		Amount:             "1000.00",
+		OrderNumber:        "2026020518462935",
+		BankCardHolderName: "张三",
+		BankCardNumber:     "6217001234567890123",
+		BankName:           "中国建设银行",
 	}
-	return NowPayWithdrawReq{data}
 }

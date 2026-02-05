@@ -1,19 +1,19 @@
-package go_nowpay
+package go_nepay
 
 import (
 	"github.com/go-resty/resty/v2"
-	"github.com/listenfengyang/go-nowpay/utils"
+	"github.com/listenfengyang/go-nepay/utils"
 )
 
 type Client struct {
-	Params *NowPayInitParams
+	Params *NePayInitParams
 
 	ryClient  *resty.Client
 	debugMode bool //是否调试模式
 	logger    utils.Logger
 }
 
-func NewClient(logger utils.Logger, params *NowPayInitParams) *Client {
+func NewClient(logger utils.Logger, params *NePayInitParams) *Client {
 	return &Client{
 		Params: params,
 

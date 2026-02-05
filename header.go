@@ -1,4 +1,4 @@
-package go_nowpay
+package go_nepay
 
 func getHeaders() map[string]string {
 	return map[string]string{

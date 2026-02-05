@@ -1,1 +1,1 @@
-package go_nowpay
+package go_nepay

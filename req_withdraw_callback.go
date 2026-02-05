@@ -1,46 +1,26 @@
-package go_nowpay
+package go_nepay
 
 import (
 	"encoding/json"
 	"errors"
-	"github.com/listenfengyang/go-nowpay/utils"
+
+	"github.com/listenfengyang/go-nepay/utils"
 	"github.com/mitchellh/mapstructure"
 )
 
 // 出金-成功回调
-func (cli *Client) WithdrawCallback(req NowPayWithdrawCallbackReq, processor func(req NowPayWithdrawCallbackReq) error) error {
-	//验证签名
-	var params map[string]string
-	params = map[string]string{"bill_no": req.BillNo, "sign": req.Sign}
-
-	// Verify signature
-	flag := utils.VerifyCallback(params, cli.Params.BackKey)
-	if !flag {
-		//签名校验失败
-		reqJson, _ := json.Marshal(req)
-		cli.logger.Errorf("nowpay successfull back verify fail, req: %s", string(reqJson))
-		return errors.New("sign verify error")
-	}
-
-	//开始处理
-	return processor(req)
-}
-
-// 出金-取消回调
-func (cli *Client) WithdrawCanceledCallback(req NowPayWithdrawCallbackReq, processor func(req NowPayWithdrawCallbackReq) error) error {
+func (cli *Client) WithdrawCallback(req NePayCallbackReq, processor func(req NePayCallbackReq) error) error {
 	//验证签名
 	var params map[string]interface{}
-	mapstructure.Decode(req, &params)
-	delete(params, "amount")
-	delete(params, "amount_usdt")
+	mapstructure.Decode(req.Data, &params)
 
 	// Verify signature
-	flag := utils.VerifyCanceledCallback(params, cli.Params.BackKey)
+	flag := utils.VerifyCallback(params, cli.Params.AccessKey)
 	if !flag {
 		//签名校验失败
 		reqJson, _ := json.Marshal(req)
-		cli.logger.Errorf("nowpay canceled back verify fail, req: %s", string(reqJson))
-		return errors.New("sign canceled verify error")
+		cli.logger.Errorf("nepay withdraw back verify fail, req: %s", string(reqJson))
+		return errors.New("sign verify error")
 	}
 
 	//开始处理

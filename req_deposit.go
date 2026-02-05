@@ -1,30 +1,32 @@
-package go_nowpay
+package go_nepay
 
 import (
 	"crypto/tls"
 	"fmt"
+
 	jsoniter "github.com/json-iterator/go"
-	"github.com/listenfengyang/go-nowpay/utils"
+	"github.com/listenfengyang/go-nepay/utils"
 	"github.com/mitchellh/mapstructure"
-	"github.com/spf13/cast"
 )
 
 // 下单
-func (cli *Client) Deposit(req NowPayDepositReq) (*NowPayDepositRsp, error) {
+func (cli *Client) Deposit(req NePayDepositReq) (*NePayDepositRsp, error) {
 
 	rawURL := cli.Params.DepositUrl
 
 	var params map[string]string
 	mapstructure.Decode(req, &params)
-
-	//补充字段
-	params["sys_no"] = cast.ToString(cli.Params.MerchantId)
+	params["channel_code"] = "BANK_CARD"
+	params["username"] = cli.Params.MerchantInfo.UserName
+	params["notify_url"] = cli.Params.NotifyUrl
+	params["return_url"] = cli.Params.ReturnUrl
 
 	// Generate signature
 	signStr, _ := utils.Sign(params, cli.Params.AccessKey)
 	params["sign"] = signStr
+	// params["sign"] = "b920c43e6f8411045152532fe29371ff" //signStr
 	fmt.Println(params)
-	var result NowPayDepositRsp
+	var result NePayDepositRsp
 
 	resp2, err := cli.ryClient.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true}).
 		SetCloseConnection(true).
@@ -38,7 +40,7 @@ func (cli *Client) Deposit(req NowPayDepositReq) (*NowPayDepositRsp, error) {
 		Post(rawURL)
 
 	restLog, _ := jsoniter.ConfigCompatibleWithStandardLibrary.Marshal(utils.GetRestyLog(resp2))
-	cli.logger.Infof("PSPResty#nowpay#deposit->%s", string(restLog))
+	cli.logger.Infof("PSPResty#nepay#deposit->%s", string(restLog))
 
 	if err != nil {
 		return nil, err

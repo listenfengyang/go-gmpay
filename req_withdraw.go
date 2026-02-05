@@ -1,34 +1,33 @@
-package go_nowpay
+package go_nepay
 
 import (
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
+
 	jsoniter "github.com/json-iterator/go"
-	"github.com/listenfengyang/go-nowpay/utils"
-	"github.com/spf13/cast"
+	"github.com/listenfengyang/go-nepay/utils"
+	"github.com/mitchellh/mapstructure"
 )
 
-func (cli *Client) WithdrawReq(req NowPayWithdrawReq) (*NowPayWithdrawRsp, error) {
+func (cli *Client) WithdrawReq(req NePayWithdrawReq) (*NePayWithdrawRsp, error) {
 
 	rawURL := cli.Params.WithdrawUrl
 	// 2. Convert struct to map for signing
 	var params map[string]string
-	params = map[string]string{}
-	b, _ := json.Marshal(req.Data)
-	params["data"] = cast.ToString(b)
-	params["sys_no"] = cast.ToString(cli.Params.MerchantId)
+	mapstructure.Decode(req, &params)
+	params["notify_url"] = cli.Params.WithdrawNotifyUrl
+	params["username"] = cli.Params.MerchantInfo.UserName
 
 	// Generate signature
-	signStr, _ := utils.SignWithdraw(params, cli.Params.AccessKey)
+	signStr, _ := utils.Sign(params, cli.Params.AccessKey)
 	params["sign"] = signStr
-	var result NowPayWithdrawRsp
+	var result NePayWithdrawRsp
 	fmt.Println(params)
+
 	resp2, err := cli.ryClient.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true}).
 		SetCloseConnection(true).
 		R().
-		SetFormData(params).
-		//SetBody(params).
+		SetBody(params).
 		SetHeaders(getHeaders()).
 		SetDebug(cli.debugMode).
 		SetResult(&result).
@@ -36,7 +35,7 @@ func (cli *Client) WithdrawReq(req NowPayWithdrawReq) (*NowPayWithdrawRsp, error
 		Post(rawURL)
 
 	restLog, _ := jsoniter.ConfigCompatibleWithStandardLibrary.Marshal(utils.GetRestyLog(resp2))
-	cli.logger.Infof("PSPResty#nowpay#withdraw->%s", string(restLog))
+	cli.logger.Infof("PSPResty#nepay#withdraw->%s", string(restLog))
 
 	if err != nil {
 		return nil, err

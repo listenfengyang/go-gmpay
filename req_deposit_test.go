@@ -1,15 +1,20 @@
-package go_nowpay
+package go_nepay
 
 import (
 	"testing"
-	"time"
 )
 
 func TestDeposit(t *testing.T) {
 	vLog := VLog{}
 	//构造client
-	cli := NewClient(vLog, &NowPayInitParams{MerchantInfo{MERCHANT_ID, ACCESS_KEY, BACK_KEY}, DEPOSIT_URL, WITHDRAW_URL})
-
+	cli := NewClient(vLog, &NePayInitParams{
+		MerchantInfo:      MerchantInfo{MERCHANT_ID, ACCESS_KEY},
+		DepositUrl:        DEPOSIT_URL,
+		WithdrawUrl:       WITHDRAW_URL,
+		NotifyUrl:         NOTIFY_URL,
+		ReturnUrl:         RETURN_URL,
+		WithdrawNotifyUrl: WITHDRAW_NOTIFY_URL,
+	})
 	//发请求
 	resp, err := cli.Deposit(GenDepositRequestDemo())
 	if err != nil {
@@ -19,13 +24,11 @@ func TestDeposit(t *testing.T) {
 	cli.logger.Infof("resp:%+v\n", resp)
 }
 
-func GenDepositRequestDemo() NowPayDepositReq {
-	return NowPayDepositReq{
-		OrderId:     "2025100443562675418",
-		OrderAmount: "10",
-		UserId:      "1",
-		OrderIp:     "127.0.0.1",
-		OrderTime:   time.Now().Format(time.DateTime),
-		PayUserName: "张三",
+func GenDepositRequestDemo() NePayDepositReq {
+	return NePayDepositReq{
+		Amount:      "5000.00",
+		OrderNumber: "202602058352366721",
+		RealName:    "张三",
+		ClientIp:    "127.0.0.1",
 	}
 }
