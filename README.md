@@ -1,2 +1,1 @@
-# go-nowpay
-psp nowpay
+# go-nepay
