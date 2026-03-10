@@ -1,4 +1,4 @@
-package go_nepay
+package go_gmpay
 
 import (
 	"fmt"
@@ -24,15 +24,11 @@ func (l VLog) Errorf(format string, args ...interface{}) {
 func TestCallback(t *testing.T) {
 	vLog := VLog{}
 	//构造client
-	cli := NewClient(vLog, &NePayInitParams{
-		MerchantInfo:      MerchantInfo{MERCHANT_ID, ACCESS_KEY},
-		DepositUrl:        DEPOSIT_URL,
-		WithdrawUrl:       WITHDRAW_URL,
-		NotifyUrl:         NOTIFY_URL,
-		WithdrawNotifyUrl: WITHDRAW_NOTIFY_URL,
+	cli := NewClient(vLog, &GmPayInitParams{
+		MerchantInfo: MerchantInfo{MERCHANT_ID, ACCESS_KEY},
 	})
 
-	err := cli.DepositCallback(GenCallbackRequestDemo(), func(NePayCallbackReq) error { return nil })
+	err := cli.DepositCallback(GenCallbackRequestDemo(), func(GmPayCallbackReq) error { return nil })
 	if err != nil {
 		cli.logger.Errorf("Error:%s", err.Error())
 		return
@@ -40,15 +36,15 @@ func TestCallback(t *testing.T) {
 	cli.logger.Infof("resp:%+v\n", err)
 }
 
-func GenCallbackRequestDemo() NePayCallbackReq {
-	return NePayCallbackReq{
+func GenCallbackRequestDemo() GmPayCallbackReq {
+	return GmPayCallbackReq{
 		Data: CallbackData{
-			OrderNumber:       "20260205835236672",
-			SystemOrderNumber: "GX20260205085851633762",
-			UserName:          "CPT02",
-			Amount:            "1100.00",
+			OrderNumber:       "202602060808160273",
+			SystemOrderNumber: "GX20260206140816639893",
+			UserName:          "CPT01",
+			Amount:            "2205.00",
 			Status:            5,
-			Sign:              "e73afcb8e47df8dcebec0239bd667b51",
+			Sign:              "3edd86a4daf46ccac3b4b28296f282f7",
 		},
 		HttpStatusCode: 200,
 		ErrorCode:      0,

@@ -1,36 +1,31 @@
-package go_nepay
+package go_gmpay
 
 import (
 	"crypto/tls"
 	"fmt"
 
 	jsoniter "github.com/json-iterator/go"
-	"github.com/listenfengyang/go-nepay/utils"
+	"github.com/listenfengyang/go-gmpay/utils"
 	"github.com/mitchellh/mapstructure"
 )
 
 // 下单
-func (cli *Client) Deposit(req NePayDepositReq) (*NePayDepositRsp, error) {
+func (cli *Client) Deposit(req GmPayDepositReq) (*GmPayDepositRsp, error) {
 
 	rawURL := cli.Params.DepositUrl
 
 	var params map[string]string
 	mapstructure.Decode(req, &params)
-	if cli.Params.MerchantInfo.UserName == "CPT01" || cli.Params.MerchantInfo.UserName == "VAHA01" {
-		params["channel_code"] = "QR_ALIPAY"
-	} else {
-		params["channel_code"] = "BANK_CARD"
-	}
-	params["username"] = cli.Params.MerchantInfo.UserName
-	params["notify_url"] = cli.Params.NotifyUrl
+
+	params["amount"] = fmt.Sprintf("%2d", req.Amount) // 必须保留2位小数
+	params["callback_url"] = cli.Params.CallbackUrl
 	params["return_url"] = cli.Params.ReturnUrl
 
 	// Generate signature
-	signStr, _ := utils.Sign(params, cli.Params.AccessKey)
+	signStr, _ := utils.Sign(params)
 	params["sign"] = signStr
-	// params["sign"] = "b920c43e6f8411045152532fe29371ff" //signStr
 	fmt.Println(params)
-	var result NePayDepositRsp
+	var result GmPayDepositRsp
 
 	resp2, err := cli.ryClient.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true}).
 		SetCloseConnection(true).
@@ -44,7 +39,7 @@ func (cli *Client) Deposit(req NePayDepositReq) (*NePayDepositRsp, error) {
 		Post(rawURL)
 
 	restLog, _ := jsoniter.ConfigCompatibleWithStandardLibrary.Marshal(utils.GetRestyLog(resp2))
-	cli.logger.Infof("PSPResty#nepay#deposit->%s", string(restLog))
+	cli.logger.Infof("PSPResty#gmPay#deposit->%s", string(restLog))
 
 	if err != nil {
 		return nil, err

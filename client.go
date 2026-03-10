@@ -1,4 +1,4 @@
-package go_nepay
+package go_gmpay
 
 import (
 	"github.com/go-resty/resty/v2"
@@ -6,14 +6,14 @@ import (
 )
 
 type Client struct {
-	Params *NePayInitParams
+	Params *GmPayInitParams
 
 	ryClient  *resty.Client
 	debugMode bool //是否调试模式
 	logger    utils.Logger
 }
 
-func NewClient(logger utils.Logger, params *NePayInitParams) *Client {
+func NewClient(logger utils.Logger, params *GmPayInitParams) *Client {
 	return &Client{
 		Params: params,
 

@@ -1,114 +1,116 @@
-package go_nepay
+package go_gmpay
 
-type NePayInitParams struct {
+type GmPayInitParams struct {
 	MerchantInfo `yaml:",inline" mapstructure:",squash"`
 
-	ChannelCode       string `json:"channelCode" mapstructure:"channelCode" config:"channelCode"  yaml:"channelCode"` // 渠道码 固定的
-	NotifyUrl         string `json:"notifyUrl" mapstructure:"notifyUrl" config:"notifyUrl"  yaml:"notifyUrl"`         // 通知地址
-	ReturnUrl         string `json:"returnUrl" mapstructure:"returnUrl" config:"returnUrl"  yaml:"returnUrl"`         // 回调地址
-	DepositUrl        string `json:"depositUrl" mapstructure:"depositUrl" config:"depositUrl"  yaml:"depositUrl"`
-	WithdrawUrl       string `json:"withdrawUrl" mapstructure:"withdrawUrl" config:"withdrawUrl"  yaml:"withdrawUrl"`
-	WithdrawNotifyUrl string `json:"withdrawNotifyUrl" mapstructure:"withdrawNotifyUrl" config:"withdrawNotifyUrl"  yaml:"withdrawNotifyUrl"`
+	DepositUrl  string `json:"deposit_url" mapstructure:"deposit_url" config:"deposit_url"  yaml:"deposit_url"`     // 入金地址
+	WithdrawUrl string `json:"withdraw_url" mapstructure:"withdraw_url" config:"withdraw_url"  yaml:"withdraw_url"` // 出金地址
+	ReturnUrl   string `json:"return_url" mapstructure:"return_url" config:"return_url"  yaml:"return_url"`         // 回调地址
+	CallbackUrl string `json:"callback_url" mapstructure:"callback_url" config:"callback_url"  yaml:"callback_url"` // 回调地址
+	PlayerId    string `json:"player_id" mapstructure:"player_id" config:"player_id"  yaml:"player_id"`             // 玩家id
 }
 
 type MerchantInfo struct {
-	UserName  string `json:"username" mapstructure:"username" config:"username"  yaml:"username"`     // 商户号
-	AccessKey string `json:"accessKey" mapstructure:"accessKey" config:"accessKey"  yaml:"accessKey"` // accessKey
+	ApiKey    string `json:"api_key" mapstructure:"api_key" config:"api_key"  yaml:"api_key"`             // apiKey
+	SecretKey string `json:"secret_key" mapstructure:"secret_key" config:"secret_key"  yaml:"secret_key"` // secretKey
 }
 
 //============================================================
 
-// nepay入金
-type NePayDepositReq struct {
-	ChannelCode string `json:"channelCode" form:"channelCode" mapstructure:"channel_code"` // 渠道码 固定的
-	UserName    string `json:"username" form:"username" mapstructure:"username"`           //商户orderNo
-	Amount      string `json:"amount" form:"amount" mapstructure:"amount"`                 //订单金额
-	OrderNumber string `json:"orderNumber" form:"orderNumber" mapstructure:"order_number"` //唯一订单号
-	RealName    string `json:"realName" form:"realName" mapstructure:"real_name"`          //客户真实姓名，非必填
-	ClientIp    string `json:"clientIp" form:"clientIp" mapstructure:"client_ip"`          //客户IP地址
-
-	//这个不需要业务侧使用,而是sdk帮计算和补充
-	//Sign        string `json:"sign" mapstructure:"sign"`               //签名
+// gmpay入金
+type GmPayDepositReq struct {
+	ApiKey          string `json:"api_key" mapstructure:"api_key" config:"api_key"  yaml:"api_key"`                                         // apiKey
+	RefNo           string `json:"ref_no" mapstructure:"ref_no" config:"ref_no"  yaml:"ref_no"`                                             // 订单号
+	Amount          string `json:"amount" mapstructure:"amount" config:"amount"  yaml:"amount"`                                             // 金额
+	PaymentMethodId string `json:"payment_method_id" mapstructure:"payment_method_id" config:"payment_method_id"  yaml:"payment_method_id"` // Online Banking = 1 PayNow = 2
+	Currency        string `json:"currency" mapstructure:"currency" config:"currency"  yaml:"currency"`                                     // 币种
+	ReturnUrl       string `json:"return_url" mapstructure:"return_url" config:"return_url"  yaml:"return_url"`                             // 回调地址
+	CallbackUrl     string `json:"callback_url" mapstructure:"callback_url" config:"callback_url"  yaml:"callback_url"`                     // 回调地址
+	PlayerId        string `json:"player_id" mapstructure:"player_id" config:"player_id"  yaml:"player_id"`                                 // 玩家id
+	Hash            string `json:"hash" mapstructure:"hash" config:"hash"  yaml:"hash"`                                                     // 签名  *Amount must have exactly 2 decimal places.(SHA 256) Hash Format: ref_no + amount + currency
 }
 
-type NePayDepositRsp struct {
-	HttpStatusCode int         `json:"http_status_code" mapstructure:"http_status_code"`
-	Message        string      `json:"message" mapstructure:"message"`
-	ErrorCode      int32       `json:"error_code" mapstructure:"error_code"`
-	Data           DepositData `json:"data" mapstructure:"data"`
+type GmPayDepositRsp struct {
+	Status  bool        `json:"status" mapstructure:"status"`
+	Message string      `json:"message" mapstructure:"message"`
+	Data    DepositData `json:"data" mapstructure:"data"`
 }
 
 type DepositData struct {
-	UserName           string `json:"username" mapstructure:"username"`                       //商户号              //客户真实姓名，非必填
-	Amount             string `json:"amount" mapstructure:"amount"`                           //金额（小数点后取2位）
-	OrderNumber        string `json:"order_number" mapstructure:"order_number"`               //商户订单号            //唯一订单号
-	SystemOrderNumber  string `json:"system_order_number" mapstructure:"system_order_number"` //平台订单号
-	NotifyUrl          string `json:"notify_url" mapstructure:"notify_url"`                   //异步通知地址
-	ReturnUrl          string `json:"return_url" mapstructure:"return_url"`                   //跳转URL
-	CreatedAt          string `json:"created_at" mapstructure:"created_at"`                   //建立时间
-	ConfirmedAt        string `json:"confirmed_at" mapstructure:"confirmed_at"`               //成功时间
-	Status             int32  `json:"status" mapstructure:"status"`                           //订单状态：1、2、3、7、11 处理中 | 4、5 成功 | 6、8 失败
-	Sign               string `json:"sign" mapstructure:"sign"`                               //签名
-	CasherUrl          string `json:"casher_url" mapstructure:"casher_url"`                   //以下特定通道才有
-	QrcodeUrl          string `json:"qrcode_url" mapstructure:"qrcode_url"`
-	SchemeUrl          string `json:"scheme_url" mapstructure:"scheme_url"`
-	ReceiverAccount    string `json:"receiver_account" mapstructure:"receiver_account"`
-	ReceiverBankName   string `json:"receiver_bank_name" mapstructure:"receiver_bank_name"`
-	ReceiverBankBranch string `json:"receiver_bank_branch" mapstructure:"receiver_bank_branch"`
-	ReceiverName       string `json:"receiver_name" mapstructure:"receiver_name"`
-	Note               string `json:"note" mapstructure:"note"`
+	CreatedAt            string `json:"created_at" mapstructure:"created_at"`                       //建立时间
+	TransactionReference string `json:"transaction_reference" mapstructure:"transaction_reference"` // 交易引用号
+	RefNo                string `json:"ref_no" mapstructure:"ref_no"`                               // 订单号
+	Currency             string `json:"currency" mapstructure:"currency"`                           // 币种
+	PaymentMethod        string `json:"payment_method" mapstructure:"payment_method"`               // 支付方式
+	Amount               string `json:"amount" mapstructure:"amount"`                               //金额（小数点后取2位）
+	PlatformCharge       int32  `json:"platform_charge" mapstructure:"platform_charge"`             //平台手续费（小数点后取2位）
+	FinalAmount          int32  `json:"final_amount" mapstructure:"final_amount"`                   //最终到账金额（小数点后取2位）
+	ReturnUrl            string `json:"return_url" mapstructure:"return_url"`                       // 回调地址
+	CallbackUrl          string `json:"callback_url" mapstructure:"callback_url"`                   // 回调地址
+	IpAddress            string `json:"ip_address" mapstructure:"ip_address"`                       // 客户IP地址
+	PaymentLink          string `json:"payment_link" mapstructure:"payment_link"`                   // 支付链接
+	IsSandbox            bool   `json:"is_sandbox" mapstructure:"is_sandbox"`                       // 是否沙箱环境
 }
 
-// nepay出金
-type NePayWithdrawReq struct {
-	Amount             string `json:"amount" mapstructure:"amount"`                               //金额（小数点后取2位）
-	OrderNumber        string `json:"order_number" mapstructure:"order_number"`                   //商户订单号            //唯一订单号
-	BankCardHolderName string `json:"bank_card_holder_name" mapstructure:"bank_card_holder_name"` //银行账户名
-	BankCardNumber     string `json:"bank_card_number" mapstructure:"bank_card_number"`           //银行账户号
-	BankName           string `json:"bank_name" mapstructure:"bank_name"`                         //银行名称
-	// BankProvince       string `json:"bank_province" mapstructure:"bank_province"`                 //银行省份，非必填
-	// BankCity           string `json:"bank_city" mapstructure:"bank_city"`                         //银行城市，非必填
-	// UserName           string `json:"username" mapstructure:"username"`                           //商户号
-	// Sign string `json:"sign" mapstructure:"sign"` //签名NotifyUrl          string `json:"notify_url" mapstructure:"notify_url"`                       //异步通知地址
-	// NotifyUrl          string `json:"notify_url" mapstructure:"notify_url"`                       //异步通知地址
+// gmpay出金
+type GmPayWithdrawReq struct {
+	ApiKey         string `json:"api_key" mapstructure:"api_key" config:"api_key"  yaml:"api_key"`                                 // apiKey
+	RefNo          string `json:"ref_no" mapstructure:"ref_no" config:"ref_no"  yaml:"ref_no"`                                     // 订单号
+	Amount         string `json:"amount" mapstructure:"amount" config:"amount"  yaml:"amount"`                                     // 金额
+	Currency       string `json:"currency" mapstructure:"currency" config:"currency"  yaml:"currency"`                             // 币种
+	CallbackUrl    string `json:"callback_url" mapstructure:"callback_url" config:"callback_url"  yaml:"callback_url"`             // 回调地址
+	BankName       string `json:"bank_name" mapstructure:"bank_name" config:"bank_name"  yaml:"bank_name"`                         // 银行名称
+	BankholderName string `json:"bankholder_name" mapstructure:"bankholder_name" config:"bankholder_name"  yaml:"bankholder_name"` // 银行账户名
+	BankAccount    string `json:"bank_account" mapstructure:"bank_account" config:"bank_account"  yaml:"bank_account"`             // 银行账户号
+	Remarks        string `json:"remarks" mapstructure:"remarks" config:"remarks"  yaml:"remarks"`                                 // 备注
+	PlayerId       string `json:"player_id" mapstructure:"player_id" config:"player_id"  yaml:"player_id"`                         // 玩家id
+	Hash           string `json:"hash" mapstructure:"hash" config:"hash"  yaml:"hash"`                                             // 签名
 }
 
-type NePayWithdrawRsp struct {
-	HttpStatusCode int          `json:"http_status_code" mapstructure:"http_status_code"`
-	Message        string       `json:"message" mapstructure:"message"`
-	ErrorCode      int32        `json:"error_code" mapstructure:"error_code"`
-	Data           WithdrawData `json:"data" mapstructure:"data"`
+type GmPayWithdrawRsp struct {
+	Status  bool         `json:"status" mapstructure:"status"`
+	Message string       `json:"message" mapstructure:"message"`
+	Result  WithdrawData `json:"result" mapstructure:"result"`
 }
 
 type WithdrawData struct {
-	UserName           string `json:"username" mapstructure:"username"`                           //商户号
-	Amount             string `json:"amount" mapstructure:"amount"`                               //金额（小数点后取2位）
-	OrderNumber        string `json:"order_number" mapstructure:"order_number"`                   //商户订单号            //唯一订单号
-	SystemOrderNumber  string `json:"system_order_number" mapstructure:"system_order_number"`     //平台订单号
-	NotifyUrl          string `json:"notify_url" mapstructure:"notify_url"`                       //异步通知地址
-	CreatedAt          string `json:"created_at" mapstructure:"created_at"`                       //建立时间
-	ConfirmedAt        string `json:"confirmed_at" mapstructure:"confirmed_at"`                   //成功时间
-	BankCardHolderName string `json:"bank_card_holder_name" mapstructure:"bank_card_holder_name"` //银行账户名
-	BankCardNumber     string `json:"bank_card_number" mapstructure:"bank_card_number"`           //银行账户号
-	BankName           string `json:"bank_name" mapstructure:"bank_name"`                         //银行名称
-	BankProvince       string `json:"bank_province" mapstructure:"bank_province"`                 //银行省份，非必填
-	BankCity           string `json:"bank_city" mapstructure:"bank_city"`                         //银行城市，非必填
-	Sign               string `json:"sign" mapstructure:"sign"`                                   //签名
+	StatusId             int32  `json:"status_id" mapstructure:"status_id"`
+	Status               string `json:"status" mapstructure:"status"`
+	RefNo                string `json:"ref_no" mapstructure:"ref_no"`
+	Currency             string `json:"currency" mapstructure:"currency"`
+	Amount               int32  `json:"amount" mapstructure:"amount"`
+	PlatformCharge       int32  `json:"platform_charge" mapstructure:"platform_charge"`
+	FinalAmount          int32  `json:"final_amount" mapstructure:"final_amount"`
+	BankName             string `json:"bank_name" mapstructure:"bank_name"`
+	BankholderName       string `json:"bankholder_name" mapstructure:"bankholder_name"`
+	BankAccount          string `json:"bank_account" mapstructure:"bank_account"`
+	Remarks              string `json:"remarks" mapstructure:"remarks"`
+	CallbackUrl          string `json:"callback_url" mapstructure:"callback_url"`
+	TransactionReference string `json:"transaction_reference" mapstructure:"transaction_reference"`
 }
 
-// 入金&出金回调
-type NePayCallbackReq struct {
-	HttpStatusCode int          `json:"httpStatusCode" form:"httpStatusCode" mapstructure:"httpStatusCode"`
-	Message        string       `json:"message" form:"message" mapstructure:"message"`
-	ErrorCode      int64        `json:"errorCode" form:"errorCode" mapstructure:"errorCode"`
-	Data           CallbackData `json:"data" form:"data" mapstructure:"data"`
+// 入金回调
+type GmPayDepositCallbackReq struct {
+	Status               string `json:"status" form:"status" mapstructure:"status"`                                              // Completed、 Failed
+	Currency             string `json:"currency" form:"currency" mapstructure:"currency"`                                        //币种
+	Amount               string `json:"amount" form:"amount" mapstructure:"amount"`                                              //金额（小数点后取2位）
+	PlatformCharge       string `json:"platform_charge" form:"platform_charge" mapstructure:"platform_charge"`                   //平台手续费（小数点后取2位）
+	RefNo                string `json:"ref_no" form:"ref_no" mapstructure:"ref_no"`                                              //平台订单号
+	TransactionReference string `json:"transaction_reference" form:"transaction_reference" mapstructure:"transaction_reference"` //交易引用号
+	UpdatedAt            string `json:"updated_at" form:"updated_at" mapstructure:"updated_at"`                                  //更新时间
+	IsSandBox            int32  `json:"is_sandbox" form:"is_sandbox" mapstructure:"is_sandbox"`                                  //是否沙箱环境
+	// Callback hash using SHA256 transaction_reference + amount + currency
+	Hash string `json:"hash" form:"hash" mapstructure:"hash"` //签名
 }
 
-type CallbackData struct {
-	UserName          string `json:"username" form:"username" mapstructure:"username"`                                  //商户号
-	Amount            string `json:"amount" form:"amount" mapstructure:"amount"`                                        //金额（小数点后取2位）
-	OrderNumber       string `json:"order_number" form:"order_number" mapstructure:"order_number"`                      //商户订单号            //唯一订单号
-	SystemOrderNumber string `json:"system_order_number" form:"system_order_number" mapstructure:"system_order_number"` //平台订单号
-	Status            int32  `json:"status" form:"status" mapstructure:"status"`                                        //订单状态：1、2、3、7、11 处理中 | 4、5 成功 | 6、8 失败
-	Sign              string `json:"sign" form:"sign" mapstructure:"sign"`                                              //签名
+type GmPayDepositCallbackRsp struct {
+	Status               string `json:"status" form:"status" mapstructure:"status"`                                              // Completed、 Failed
+	Currency             string `json:"currency" form:"currency" mapstructure:"currency"`                                        //币种
+	Amount               string `json:"amount" form:"amount" mapstructure:"amount"`                                              //金额（小数点后取2位）
+	PlatformCharge       string `json:"platform_charge" form:"platform_charge" mapstructure:"platform_charge"`                   //平台手续费（小数点后取2位）
+	RefNo                string `json:"ref_no" form:"ref_no" mapstructure:"ref_no"`                                              //平台订单号
+	TransactionReference string `json:"transaction_reference" form:"transaction_reference" mapstructure:"transaction_reference"` //交易引用号
+	UpdatedAt            string `json:"updated_at" form:"updated_at" mapstructure:"updated_at"`                                  //更新时间
+	IsSandBox            int32  `json:"is_sandbox" form:"is_sandbox" mapstructure:"is_sandbox"`                                  //是否沙箱环境
+	Hash                 string `json:"hash" form:"hash" mapstructure:"hash"`
 }

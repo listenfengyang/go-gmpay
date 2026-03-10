@@ -1,4 +1,3 @@
-# go-nepay
-psp nowpay sdk
+# go-gmpay
+psp gmpay sdk
 
-新疆客户使用，支持入金和出金

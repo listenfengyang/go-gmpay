@@ -1,4 +1,4 @@
-package go_nepay
+package go_gmpay
 
 import (
 	"testing"

@@ -1,4 +1,4 @@
-package go_nepay
+package go_gmpay
 
 import (
 	"testing"
@@ -7,13 +7,13 @@ import (
 func TestDeposit(t *testing.T) {
 	vLog := VLog{}
 	//构造client
-	cli := NewClient(vLog, &NePayInitParams{
-		MerchantInfo:      MerchantInfo{MERCHANT_ID, ACCESS_KEY},
-		DepositUrl:        DEPOSIT_URL,
-		WithdrawUrl:       WITHDRAW_URL,
-		NotifyUrl:         NOTIFY_URL,
-		ReturnUrl:         RETURN_URL,
-		WithdrawNotifyUrl: WITHDRAW_NOTIFY_URL,
+	cli := NewClient(vLog, &GmPayInitParams{
+		MerchantInfo: MerchantInfo{
+			ApiKey:    API_KEY,
+			SecretKey: SECRET_KEY,
+		},
+		DepositUrl:  DEPOSIT_URL,
+		WithdrawUrl: WITHDRAW_URL,
 	})
 	//发请求
 	resp, err := cli.Deposit(GenDepositRequestDemo())
@@ -24,11 +24,15 @@ func TestDeposit(t *testing.T) {
 	cli.logger.Infof("resp:%+v\n", resp)
 }
 
-func GenDepositRequestDemo() NePayDepositReq {
-	return NePayDepositReq{
-		Amount:      "1200.00",
-		OrderNumber: "202602058352366725",
-		RealName:    "张三",
-		ClientIp:    "127.0.0.1",
+func GenDepositRequestDemo() GmPayDepositReq {
+	return GmPayDepositReq{
+		ApiKey:          API_KEY,
+		RefNo:           "20230824152000000001",
+		Amount:          "100",
+		PaymentMethodId: "1",
+		Currency:        "SGD",
+		ReturnUrl:       "https://www.baidu.com",
+		CallbackUrl:     "https://www.baidu.com",
+		PlayerId:        "123456",
 	}
 }
