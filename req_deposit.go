@@ -3,6 +3,7 @@ package go_gmpay
 import (
 	"crypto/tls"
 	"fmt"
+	"strconv"
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/listenfengyang/go-gmpay/utils"
@@ -17,13 +18,14 @@ func (cli *Client) Deposit(req GmPayDepositReq) (*GmPayDepositRsp, error) {
 	var params map[string]string
 	mapstructure.Decode(req, &params)
 
-	params["amount"] = fmt.Sprintf("%2d", req.Amount) // 必须保留2位小数
-	params["callback_url"] = cli.Params.CallbackUrl
+	amount, _ := strconv.ParseFloat(req.Amount, 64)
+	params["amount"] = strconv.FormatFloat(amount, 'f', 2, 64) // 必须保留2位小数
+	params["callback_url"] = cli.Params.DepositNotifyUrl
 	params["return_url"] = cli.Params.ReturnUrl
 
 	// Generate signature
-	signStr, _ := utils.Sign(params)
-	params["sign"] = signStr
+	signStr, _ := utils.Sign(params, cli.Params.MerchantInfo.SecretKey)
+	params["hash"] = signStr
 	fmt.Println(params)
 	var result GmPayDepositRsp
 

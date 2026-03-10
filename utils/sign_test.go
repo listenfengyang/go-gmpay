@@ -12,7 +12,9 @@ func TestSign(t *testing.T) {
 		"protocol": "ERC20",
 	}
 
-	signStr, _ := Sign(params)
+	secretKey := "9VLJGVUFZYXNECZA9FLI"
+
+	signStr, _ := Sign(params, secretKey)
 
 	fmt.Println(signStr)
 

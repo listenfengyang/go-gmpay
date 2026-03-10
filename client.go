@@ -2,7 +2,7 @@ package go_gmpay
 
 import (
 	"github.com/go-resty/resty/v2"
-	"github.com/listenfengyang/go-nepay/utils"
+	"github.com/listenfengyang/go-gmpay/utils"
 )
 
 type Client struct {

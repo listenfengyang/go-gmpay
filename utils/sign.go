@@ -1,24 +1,20 @@
 package utils
 
 import (
-	"crypto/md5"
+	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"net/url"
-	"sort"
-	"strings"
-
-	"github.com/samber/lo"
-	"github.com/spf13/cast"
 )
 
 // SHA256 transaction_reference + amount + currency
-func Sign(params map[string]string) (string, error) {
+func Sign(params map[string]string, secretKey string) (string, error) {
 	if ref, ok := params["transaction_reference"]; ok {
-		params["transaction_reference"] = ref
+		params["ref_no"] = ref
+	} else if ref, ok := params["ref_no"]; ok {
+		params["ref_no"] = ref
 	} else {
-		return "", fmt.Errorf("transaction_reference is required")
+		return "", fmt.Errorf("ref_no or transaction_reference is required")
 	}
 	if amount, ok := params["amount"]; ok {
 		params["amount"] = amount
@@ -31,60 +27,36 @@ func Sign(params map[string]string) (string, error) {
 		return "", fmt.Errorf("currency is required")
 	}
 
-	signStr := fmt.Sprintf("%s%s%s", params["transaction_reference"], params["amount"], params["currency"])
+	signStr := fmt.Sprintf("%s%s%s", params["ref_no"], params["amount"], params["currency"])
 	fmt.Printf("SHA256签名before: %s\n\n", signStr)
 
-	hash := sha256.Sum256([]byte(signStr))
-	signStr = hex.EncodeToString(hash[:])
-	fmt.Printf("SHA256签名after: %s\n\n", signStr)
-	return signStr, nil
+	// 计算 HMAC-SHA256
+	mac := hmac.New(sha256.New, []byte(secretKey))
+	mac.Write([]byte(signStr))
+	sum := mac.Sum(nil)
+
+	// 输出十六进制字符串
+	callbackHash := hex.EncodeToString(sum)
+	fmt.Printf("SHA256签名after: %s\n\n", callbackHash)
+	return callbackHash, nil
 }
 
-func Verify(params map[string]string) (bool, error) {
+func Verify(params map[string]string, secretKey string) (bool, error) {
 	// Check if signature exists in params
-	signature, exists := params["sign"]
+	signature, exists := params["hash"]
 	if !exists {
 		return false, nil
 	}
 
 	// Remove signature from params for verification
-	delete(params, "sign")
+	delete(params, "hash")
 
 	// Generate current signature
-	currentSignature, err := Sign(params)
+	currentSignature, err := Sign(params, secretKey)
 	if err != nil {
 		return false, fmt.Errorf("signature generation failed: %w", err)
 	}
 
 	// Compare signatures
 	return signature == currentSignature, nil
-}
-
-// 入金&出金回调-成功-验签
-func VerifyCallback(params map[string]interface{}, signKey string) bool {
-	// 1. 依照 ASCII 顺序由小到大做排序
-	//  key1=value1&key2=value2...的方式组出字串，最后再加上&secret_key={密钥}
-	keys := lo.Keys(params)
-	sort.Strings(keys)
-
-	var sb strings.Builder
-	for _, k := range keys {
-		value := cast.ToString(params[k])
-		if k != "sign" {
-			//只有非空才可以参与签名
-			sb.WriteString(fmt.Sprintf("%s=%s&", k, url.QueryEscape(value)))
-		}
-	}
-	signStr := sb.String()
-	signStr += fmt.Sprintf("secret_key=%s", signKey)
-
-	fmt.Printf("[rawString]%s\n", signStr)
-
-	// 第2步骤产生签名字串做 md5 加签得到sign
-	hash := md5.Sum([]byte(signStr))
-	signResult := hex.EncodeToString(hash[:])
-
-	fmt.Printf("MD5签名: %s\n\n", signResult)
-	fmt.Printf("回调sign值: %s\n\n", params["sign"])
-	return signResult == params["sign"]
 }

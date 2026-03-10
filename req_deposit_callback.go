@@ -11,10 +11,14 @@ import (
 // 充值-成功回调
 func (cli *Client) DepositCallback(req GmPayCallbackReq, processor func(GmPayCallbackReq) error) error {
 	//验证签名
-	var params map[string]interface{}
-	mapstructure.Decode(req.Data, &params)
+	var params map[string]string
+	mapstructure.Decode(req, &params)
 
-	flag := utils.VerifyCallback(params, cli.Params.MerchantInfo.AccessKey)
+	flag, err := utils.Verify(params, cli.Params.MerchantInfo.SecretKey)
+	if err != nil {
+		cli.logger.Errorf("gmPay deposit back verify error, req: %s, err: %s", req, err.Error())
+		return err
+	}
 	if !flag {
 		//签名校验失败
 		reqJson, _ := json.Marshal(req)

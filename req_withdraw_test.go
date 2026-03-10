@@ -7,12 +7,15 @@ import (
 func TestWithdraw(t *testing.T) {
 	vLog := VLog{}
 	//构造client
-	cli := NewClient(vLog, &NePayInitParams{
-		MerchantInfo:      MerchantInfo{MERCHANT_ID, ACCESS_KEY},
+	cli := NewClient(vLog, &GmPayInitParams{
+		MerchantInfo: MerchantInfo{
+			ApiKey:    API_KEY,
+			SecretKey: SECRET_KEY,
+		},
 		DepositUrl:        DEPOSIT_URL,
 		WithdrawUrl:       WITHDRAW_URL,
-		NotifyUrl:         NOTIFY_URL,
 		WithdrawNotifyUrl: WITHDRAW_NOTIFY_URL,
+		ReturnUrl:         RETURN_URL,
 	})
 
 	//发请求
@@ -24,12 +27,15 @@ func TestWithdraw(t *testing.T) {
 	cli.logger.Infof("resp:%+v\n", resp)
 }
 
-func GenWithdrawRequestDemo() NePayWithdrawReq {
-	return NePayWithdrawReq{
-		Amount:             "1000.00",
-		OrderNumber:        "20260205184629352",
-		BankCardHolderName: "张三",
-		BankCardNumber:     "6217001234567890123",
-		BankName:           "中国建设银行",
+func GenWithdrawRequestDemo() GmPayWithdrawReq {
+	return GmPayWithdrawReq{
+		ApiKey:         API_KEY,
+		RefNo:          "2023082415202",
+		Amount:         "50",
+		Currency:       "SGD",
+		PlayerId:       "123456",
+		BankName:       "BOC",
+		BankholderName: "lis",
+		BankAccount:    "3523",
 	}
 }

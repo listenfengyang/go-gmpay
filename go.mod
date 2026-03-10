@@ -1,4 +1,4 @@
-module github.com/listenfengyang/go-nepay
+module github.com/listenfengyang/go-gmpay
 
 go 1.24.2
 

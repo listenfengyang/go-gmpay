@@ -25,7 +25,10 @@ func TestCallback(t *testing.T) {
 	vLog := VLog{}
 	//构造client
 	cli := NewClient(vLog, &GmPayInitParams{
-		MerchantInfo: MerchantInfo{MERCHANT_ID, ACCESS_KEY},
+		MerchantInfo: MerchantInfo{
+			ApiKey:    API_KEY,
+			SecretKey: SECRET_KEY,
+		},
 	})
 
 	err := cli.DepositCallback(GenCallbackRequestDemo(), func(GmPayCallbackReq) error { return nil })
@@ -38,16 +41,14 @@ func TestCallback(t *testing.T) {
 
 func GenCallbackRequestDemo() GmPayCallbackReq {
 	return GmPayCallbackReq{
-		Data: CallbackData{
-			OrderNumber:       "202602060808160273",
-			SystemOrderNumber: "GX20260206140816639893",
-			UserName:          "CPT01",
-			Amount:            "2205.00",
-			Status:            5,
-			Sign:              "3edd86a4daf46ccac3b4b28296f282f7",
-		},
-		HttpStatusCode: 200,
-		ErrorCode:      0,
-		Message:        "u5f02u6b65u56deu8c03",
+		Status:               "failed",
+		Currency:             "SGD",
+		Amount:               "100.00",
+		Hash:                 "14797451ca4461ab0bd67016b7206ed12b4ca827d7270df0bb4fc6a7fa7ce8d1",
+		RefNo:                "20230824152007",
+		PlatformCharge:       "2.00",
+		TransactionReference: "9149DBF33A7DBB330C8097D15F083FF4",
+		UpdatedAt:            "2026-03-10 16:38:15",
+		IsSandBox:            "1",
 	}
 }
