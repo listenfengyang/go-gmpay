@@ -20,6 +20,7 @@ func (cli *Client) Deposit(req GmPayDepositReq) (*GmPayDepositRsp, error) {
 
 	amount, _ := strconv.ParseFloat(req.Amount, 64)
 	params["amount"] = strconv.FormatFloat(amount, 'f', 2, 64) // 必须保留2位小数
+	params["api_key"] = cli.Params.MerchantInfo.ApiKey
 	params["callback_url"] = cli.Params.DepositNotifyUrl
 	params["return_url"] = cli.Params.ReturnUrl
 

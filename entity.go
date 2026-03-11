@@ -3,17 +3,16 @@ package go_gmpay
 type GmPayInitParams struct {
 	MerchantInfo `yaml:",inline" mapstructure:",squash"`
 
-	DepositUrl        string `json:"deposit_url" mapstructure:"deposit_url" config:"deposit_url"  yaml:"deposit_url"`                                 // 入金地址
-	WithdrawUrl       string `json:"withdraw_url" mapstructure:"withdraw_url" config:"withdraw_url"  yaml:"withdraw_url"`                             // 出金地址
-	ReturnUrl         string `json:"return_url" mapstructure:"return_url" config:"return_url"  yaml:"return_url"`                                     // 回调地址
-	DepositNotifyUrl  string `json:"deposit_notify_url" mapstructure:"deposit_notify_url" config:"deposit_notify_url"  yaml:"deposit_notify_url"`     // 入金回调地址
-	WithdrawNotifyUrl string `json:"withdraw_notify_url" mapstructure:"withdraw_notify_url" config:"withdraw_notify_url"  yaml:"withdraw_notify_url"` // 出金回调地址
-	PlayerId          string `json:"player_id" mapstructure:"player_id" config:"player_id"  yaml:"player_id"`                                         // 玩家id
+	DepositUrl        string `json:"depositUrl" mapstructure:"depositUrl" config:"depositUrl"  yaml:"depositUrl"`                             // 入金地址
+	WithdrawUrl       string `json:"withdrawUrl" mapstructure:"withdrawUrl" config:"withdrawUrl"  yaml:"withdrawUrl"`                         // 出金地址
+	ReturnUrl         string `json:"returnUrl" mapstructure:"returnUrl" config:"returnUrl"  yaml:"returnUrl"`                                 // 回调地址
+	DepositNotifyUrl  string `json:"depositNotifyUrl" mapstructure:"depositNotifyUrl" config:"depositNotifyUrl"  yaml:"depositNotifyUrl"`     // 入金回调地址
+	WithdrawNotifyUrl string `json:"withdrawNotifyUrl" mapstructure:"withdrawNotifyUrl" config:"withdrawNotifyUrl"  yaml:"withdrawNotifyUrl"` // 出金回调地址
 }
 
 type MerchantInfo struct {
-	ApiKey    string `json:"api_key" mapstructure:"api_key" config:"api_key"  yaml:"api_key"`             // apiKey
-	SecretKey string `json:"secret_key" mapstructure:"secret_key" config:"secret_key"  yaml:"secret_key"` // secretKey
+	ApiKey    string `json:"apiKey" mapstructure:"apiKey" config:"apiKey"  yaml:"apiKey"`             // apiKey
+	SecretKey string `json:"secretKey" mapstructure:"secretKey" config:"secretKey"  yaml:"secretKey"` // secretKey
 }
 
 //============================================================

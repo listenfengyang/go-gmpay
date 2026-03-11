@@ -29,7 +29,6 @@ func TestDeposit(t *testing.T) {
 
 func GenDepositRequestDemo() GmPayDepositReq {
 	return GmPayDepositReq{
-		ApiKey:          API_KEY,
 		RefNo:           "20230824152007",
 		Amount:          "100",
 		PaymentMethodId: "2",

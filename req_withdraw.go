@@ -19,6 +19,7 @@ func (cli *Client) WithdrawReq(req GmPayWithdrawReq) (*GmPayWithdrawRsp, error) 
 	mapstructure.Decode(req, &params)
 	amount, _ := strconv.ParseFloat(req.Amount, 64)
 	params["amount"] = strconv.FormatFloat(amount, 'f', 2, 64) // 必须保留2位小数
+	params["api_key"] = cli.Params.MerchantInfo.ApiKey
 	params["callback_url"] = cli.Params.WithdrawNotifyUrl
 
 	// Generate signature

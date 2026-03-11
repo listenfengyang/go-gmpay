@@ -29,7 +29,6 @@ func TestWithdraw(t *testing.T) {
 
 func GenWithdrawRequestDemo() GmPayWithdrawReq {
 	return GmPayWithdrawReq{
-		ApiKey:         API_KEY,
 		RefNo:          "2023082415202",
 		Amount:         "50",
 		Currency:       "SGD",
