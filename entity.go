@@ -74,19 +74,19 @@ type GmPayWithdrawRsp struct {
 }
 
 type WithdrawData struct {
-	StatusId             int32  `json:"status_id" mapstructure:"status_id"`
-	Status               string `json:"status" mapstructure:"status"`
-	RefNo                string `json:"ref_no" mapstructure:"ref_no"`
-	Currency             string `json:"currency" mapstructure:"currency"`
-	Amount               int32  `json:"amount" mapstructure:"amount"`
-	PlatformCharge       int32  `json:"platform_charge" mapstructure:"platform_charge"`
-	FinalAmount          int32  `json:"final_amount" mapstructure:"final_amount"`
-	BankName             string `json:"bank_name" mapstructure:"bank_name"`
-	BankholderName       string `json:"bankholder_name" mapstructure:"bankholder_name"`
-	BankAccount          string `json:"bank_account" mapstructure:"bank_account"`
-	Remarks              string `json:"remarks" mapstructure:"remarks"`
-	CallbackUrl          string `json:"callback_url" mapstructure:"callback_url"`
-	TransactionReference string `json:"transaction_reference" mapstructure:"transaction_reference"`
+	StatusId             int32   `json:"status_id" mapstructure:"status_id"`
+	Status               string  `json:"status" mapstructure:"status"`
+	RefNo                string  `json:"ref_no" mapstructure:"ref_no"`
+	Currency             string  `json:"currency" mapstructure:"currency"`
+	Amount               float64 `json:"amount" mapstructure:"amount"`
+	PlatformCharge       float64 `json:"platform_charge" mapstructure:"platform_charge"`
+	FinalAmount          float64 `json:"final_amount" mapstructure:"final_amount"`
+	BankName             string  `json:"bank_name" mapstructure:"bank_name"`
+	BankholderName       string  `json:"bankholder_name" mapstructure:"bankholder_name"`
+	BankAccount          string  `json:"bank_account" mapstructure:"bank_account"`
+	Remarks              string  `json:"remarks" mapstructure:"remarks"`
+	CallbackUrl          string  `json:"callback_url" mapstructure:"callback_url"`
+	TransactionReference string  `json:"transaction_reference" mapstructure:"transaction_reference"`
 }
 
 // 入金和出金回调

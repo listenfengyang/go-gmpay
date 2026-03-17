@@ -29,10 +29,10 @@ func TestDeposit(t *testing.T) {
 
 func GenDepositRequestDemo() GmPayDepositReq {
 	return GmPayDepositReq{
-		RefNo:           "20230824152007",
-		Amount:          "100",
-		PaymentMethodId: "2",
+		RefNo:           "202603110544520374",
+		Amount:          "114.00",
+		PaymentMethodId: "1",
 		Currency:        "SGD",
-		PlayerId:        "123456",
+		PlayerId:        "",
 	}
 }
