@@ -98,7 +98,7 @@ type GmPayCallbackReq struct {
 	RefNo                string `json:"ref_no" form:"ref_no" mapstructure:"ref_no"`                                              //平台订单号
 	TransactionReference string `json:"transaction_reference" form:"transaction_reference" mapstructure:"transaction_reference"` //交易引用号
 	UpdatedAt            string `json:"updated_at" form:"updated_at" mapstructure:"updated_at"`                                  //更新时间
-	IsSandBox            string `json:"is_sandbox" form:"is_sandbox" mapstructure:"is_sandbox"`                                  //是否沙箱环境
+	// IsSandBox            string `json:"is_sandbox" form:"is_sandbox" mapstructure:"is_sandbox"`                                  //是否沙箱环境
 	// Callback hash using SHA256 transaction_reference + amount + currency
 	Hash string `json:"hash" form:"hash" mapstructure:"hash"` //签名
 }
@@ -111,6 +111,6 @@ type GmPayCallbackRsp struct {
 	RefNo                string `json:"ref_no" form:"ref_no" mapstructure:"ref_no"`                                              //平台订单号
 	TransactionReference string `json:"transaction_reference" form:"transaction_reference" mapstructure:"transaction_reference"` //交易引用号
 	UpdatedAt            string `json:"updated_at" form:"updated_at" mapstructure:"updated_at"`                                  //更新时间
-	IsSandBox            int32  `json:"is_sandbox" form:"is_sandbox" mapstructure:"is_sandbox"`                                  //是否沙箱环境
-	Hash                 string `json:"hash" form:"hash" mapstructure:"hash"`
+	// IsSandBox            int32  `json:"is_sandbox" form:"is_sandbox" mapstructure:"is_sandbox"`                                  //是否沙箱环境
+	Hash string `json:"hash" form:"hash" mapstructure:"hash"`
 }
